@@ -14,6 +14,18 @@ public interface IScoringStrategy {
             this.strategyName = strategyName;
             this.hand = hand;
         }
+
+        public int getScore() {
+            return score;
+        }
+
+        public String getStrategyName() {
+            return strategyName;
+        }
+
+        public Hand getHand() {
+            return hand;
+        }
     }
 
     public List<Score> getScore(Hand hand);

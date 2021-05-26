@@ -29,6 +29,7 @@ public class ScoringStrategySingletonFactory {
                 pairsStrategy.add(new Pair4());
                 pairsStrategy.add(new Pair3());
                 pairsStrategy.add(new Pair2());
+                playStrategy.add(pairsStrategy);
                 return playStrategy;
             case "SHOW":
                 return null;

@@ -4,6 +4,9 @@ package cribbage;
 
 import ch.aplu.jcardgame.*;
 import ch.aplu.jgamegrid.*;
+import score.IScoringStrategy;
+import score.Play.Pair2;
+import score.ScoringStrategySingletonFactory;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -237,12 +240,16 @@ public class Cribbage extends CardGame {
     }
 
     private void play() {
+        ScoringStrategySingletonFactory strategy = ScoringStrategySingletonFactory.getInstance();
+        IScoringStrategy playStrategy = strategy.getScoringStrategy("PLAY");
+        IScoringStrategy goStrategy = strategy.getScoringStrategy("GO");
         final int thirtyone = 31;
         List<Hand> segments = new ArrayList<>();
         int currentPlayer = 0; // Player 1 is dealer
         Segment s = new Segment();
         s.reset(segments);
-        while (!(players[0].emptyHand() && players[1].emptyHand())) {
+        boolean go = false;
+        while (!go) {
             // System.out.println("segments.size() = " + segments.size());
             Card nextCard = players[currentPlayer].lay(thirtyone - total(s.segment));
             if (nextCard == null) {
@@ -250,6 +257,10 @@ public class Cribbage extends CardGame {
                     // Another "go" after previous one with no intervening cards
                     // lastPlayer gets 1 point for a "go"
                     s.newSegment = true;
+                    scores[currentPlayer] += goStrategy.getScore(s.segment).get(0).getScore();
+                    System.out.printf("player %d get 1 score%n", currentPlayer);
+                    updateScore(currentPlayer);
+                    go = true;
                 } else {
                     // currentPlayer says "go"
                     s.go = true;
@@ -258,6 +269,12 @@ public class Cribbage extends CardGame {
             } else {
                 s.lastPlayer = currentPlayer; // last Player to play a card in this segment
                 transfer(nextCard, s.segment);
+                List<IScoringStrategy.Score> playScores = playStrategy.getScore(s.segment);
+                for (IScoringStrategy.Score score : playScores) {
+                    scores[currentPlayer] += score.getScore();
+                    System.out.printf("player %d get %d score by rule %s %s%n", currentPlayer,score.getScore(), score.getStrategyName(), canonical(score.getHand()));
+                    updateScore(currentPlayer);
+                }
                 if (total(s.segment) == thirtyone) {
                     // lastPlayer gets 2 points for a 31
                     s.newSegment = true;
