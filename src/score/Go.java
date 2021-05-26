@@ -5,7 +5,7 @@ import ch.aplu.jcardgame.Hand;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LastCard implements IScoringStrategy {
+public class Go implements IScoringStrategy {
     static final int SCORE = 1;
     static final String strategyName = "go";
 

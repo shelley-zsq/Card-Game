@@ -8,7 +8,7 @@ public class ScoringStrategySingletonFactory {
     public IScoringStrategy getScoringStrategy(String stage) {
         switch (stage) {
             case "GO":
-                return new LastCard();
+                return new Go();
             case "PLAY":
                 CompositeScoringStrategy playStrategy = new DifferentCategoryScoringStrategy();
                 // Total 15 / 31
