@@ -1,8 +1,9 @@
-package score;
+package score.Play;
 
 import ch.aplu.jcardgame.Card;
 import ch.aplu.jcardgame.Hand;
 import cribbage.Cribbage;
+import score.IScoringStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.List;
 public class ThirtyOne implements IScoringStrategy {
     static final int SCORE = 2;
     static final int THIRTY_ONE = 31;
-    static final String strategyName = "thirtyone";
+    static final String STRATEGY_NAME = "thirtyone";
 
     @Override
     public List<Score> getScore(Hand hand) {
@@ -20,7 +21,7 @@ public class ThirtyOne implements IScoringStrategy {
             total += ((Cribbage.Rank) c.getRank()).value;
         }
         if (total == THIRTY_ONE) {
-            result.add(new Score(SCORE, strategyName, hand));
+            result.add(new Score(SCORE, STRATEGY_NAME, hand));
         }
         return result;
     }
