@@ -5,8 +5,9 @@ package cribbage;
 import ch.aplu.jcardgame.*;
 import ch.aplu.jgamegrid.*;
 import score.IScoringStrategy;
-import score.Play.Pair2;
+import score.Utils;
 import score.ScoringStrategySingletonFactory;
+import score.Show.Fifteen;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -142,6 +143,8 @@ public class Cribbage extends CardGame {
     private final Hand[] hands = new Hand[nPlayers];
     private Hand starter;
     private Hand crib;
+    private Hand p0;
+    private Hand p1;
 
     public static void setStatus(String string) {
         cribbage.setStatusText(string);
@@ -294,9 +297,29 @@ public class Cribbage extends CardGame {
     }
 
     void showHandsCrib() {
-        // score player 0 (non dealer)
-        // score player 1 (dealer)
+        ScoringStrategySingletonFactory strategy = ScoringStrategySingletonFactory.getInstance();
+        IScoringStrategy showStrategy = strategy.getScoringStrategy("SHOW");
+        p0.insert(starter.get(0).clone(), false);
+        List<IScoringStrategy.Score> showScores = showStrategy.getScore(p0);
+        for (IScoringStrategy.Score score : showScores) {
+            scores[0] += score.getScore();
+            System.out.printf("player %d get %d score by rule %s %s%n", 0,score.getScore(), score.getStrategyName(), canonical(score.getHand()));
+            updateScore(0);
+        }
+        p1.insert(starter.get(0).clone(), false);
+        showScores = showStrategy.getScore(p1);
+        for (IScoringStrategy.Score score : showScores) {
+            scores[1] += score.getScore();
+            System.out.printf("player %d get %d score by rule %s %s%n", 1,score.getScore(), score.getStrategyName(), canonical(score.getHand()));
+            updateScore(1);
+        }
         // score crib (for dealer)
+        showScores = showStrategy.getScore(crib);
+        for (IScoringStrategy.Score score : showScores) {
+            scores[1] += score.getScore();
+            System.out.printf("player %d get %d score by rule %s %s%n", 1,score.getScore(), score.getStrategyName(), canonical(score.getHand()));
+            updateScore(1);
+        }
     }
 
     public Cribbage() {
@@ -317,6 +340,8 @@ public class Cribbage extends CardGame {
         /* Play the round */
         deal(pack, hands);
         discardToCrib();
+        p0 = Utils.newHand(players[0].hand);
+        p1 = Utils.newHand(players[1].hand);
         starter(pack);
         play();
         showHandsCrib();

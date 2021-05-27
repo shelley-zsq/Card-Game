@@ -1,4 +1,4 @@
-package score.Show;
+package score;
 
 import ch.aplu.jcardgame.Hand;
 import cribbage.Cribbage;

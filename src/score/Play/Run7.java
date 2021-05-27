@@ -1,13 +1,11 @@
 package score.Play;
 
-import ch.aplu.jcardgame.Card;
 import ch.aplu.jcardgame.Hand;
-import cribbage.Cribbage;
 import score.IScoringStrategy;
+import score.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeSet;
 
 public class Run7 implements IScoringStrategy {
     static final int NUM_CARDS = 7;

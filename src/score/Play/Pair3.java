@@ -1,9 +1,8 @@
 package score.Play;
 
-import ch.aplu.jcardgame.Card;
 import ch.aplu.jcardgame.Hand;
-import cribbage.Cribbage;
 import score.IScoringStrategy;
+import score.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
