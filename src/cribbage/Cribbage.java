@@ -4,10 +4,6 @@ package cribbage;
 
 import ch.aplu.jcardgame.*;
 import ch.aplu.jgamegrid.*;
-import score.IScoringStrategy;
-import score.Utils;
-import score.ScoringStrategySingletonFactory;
-import score.Show.Fifteen;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -27,60 +23,49 @@ public class Cribbage extends CardGame {
 
     public enum Rank {
         // Order of cards is tied to card images
-        ACE(1, 1), KING(13, 10), QUEEN(12, 10), JACK(11, 10), TEN(10, 10), NINE(9, 9), EIGHT(8, 8), SEVEN(7, 7), SIX(6, 6), FIVE(5, 5), FOUR(4, 4), THREE(3, 3), TWO(2, 2);
+        ACE(1,1), KING(13,10), QUEEN(12,10), JACK(11,10), TEN(10,10), NINE(9,9), EIGHT(8,8), SEVEN(7,7), SIX(6,6), FIVE(5,5), FOUR(4,4), THREE(3,3), TWO(2,2);
         public final int order;
         public final int value;
-
         Rank(int order, int value) {
             this.order = order;
             this.value = value;
         }
     }
 
-    static int cardValue(Card c) {
-        return ((Cribbage.Rank) c.getRank()).value;
-    }
+    static int cardValue(Card c) { return ((Cribbage.Rank) c.getRank()).value; }
 
     /*
     Canonical String representations of Suit, Rank, Card, and Hand
     */
-    String canonical(Suit s) {
-        return s.toString().substring(0, 1);
-    }
+    String canonical(Suit s) { return s.toString().substring(0, 1); }
 
     String canonical(Rank r) {
         switch (r) {
-            case ACE:
-            case KING:
-            case QUEEN:
-            case JACK:
-            case TEN:
+            case ACE:case KING:case QUEEN:case JACK:case TEN:
                 return r.toString().substring(0, 1);
             default:
                 return String.valueOf(r.value);
         }
     }
 
-    String canonical(Card c) {
-        return canonical((Rank) c.getRank()) + canonical((Suit) c.getSuit());
-    }
+    String canonical(Card c) { return canonical((Rank) c.getRank()) + canonical((Suit) c.getSuit()); }
 
     String canonical(Hand h) {
         Hand h1 = new Hand(deck); // Clone to sort without changing the original hand
-        for (Card C : h.getCardList()) h1.insert(C.getSuit(), C.getRank(), false);
+        for (Card C: h.getCardList()) h1.insert(C.getSuit(), C.getRank(), false);
         h1.sort(Hand.SortType.POINTPRIORITY, false);
         return "[" + h1.getCardList().stream().map(this::canonical).collect(Collectors.joining(",")) + "]";
     }
 
     class MyCardValues implements Deck.CardValues { // Need to generate a unique value for every card
         public int[] values(Enum suit) {  // Returns the value for each card in the suit
-            return Stream.of(Rank.values()).mapToInt(r -> (((Rank) r).order - 1) * (Suit.values().length) + suit.ordinal()).toArray();
+            return Stream.of(Rank.values()).mapToInt(r -> (((Rank) r).order-1)*(Suit.values().length)+suit.ordinal()).toArray();
         }
     }
 
     static Random random;
 
-    public static <T extends Enum<?>> T randomEnum(Class<T> clazz) {
+    public static <T extends Enum<?>> T randomEnum(Class<T> clazz){
         int x = random.nextInt(clazz.getEnumConstants().length);
         return clazz.getEnumConstants()[x];
     }
@@ -98,7 +83,7 @@ public class Cribbage extends CardGame {
 
     private void dealingOut(Hand pack, Hand[] hands) {
         for (int i = 0; i < nStartCards; i++) {
-            for (int j = 0; j < nPlayers; j++) {
+            for (int j=0; j < nPlayers; j++) {
                 Card dealt = randomCard(pack);
                 dealt.setVerso(false);  // Show the face
                 transfer(dealt, hands[j]);
@@ -108,7 +93,7 @@ public class Cribbage extends CardGame {
 
     static int SEED;
 
-    public static Card randomCard(Hand hand) {
+    public static Card randomCard(Hand hand){
         int x = random.nextInt(hand.getNumberOfCards());
         return hand.get(x);
     }
@@ -143,12 +128,8 @@ public class Cribbage extends CardGame {
     private final Hand[] hands = new Hand[nPlayers];
     private Hand starter;
     private Hand crib;
-    private Hand p0;
-    private Hand p1;
 
-    public static void setStatus(String string) {
-        cribbage.setStatusText(string);
-    }
+    public static void setStatus(String string) { cribbage.setStatusText(string); }
 
     static private final IPlayer[] players = new IPlayer[nPlayers];
     private final int[] scores = new int[nPlayers];
@@ -178,7 +159,8 @@ public class Cribbage extends CardGame {
             players[i].startSegment(deck, hands[i]);
         }
         RowLayout[] layouts = new RowLayout[nPlayers];
-        for (int i = 0; i < nPlayers; i++) {
+        for (int i = 0; i < nPlayers; i++)
+        {
             layouts[i] = new RowLayout(handLocations[i], handWidth);
             layouts[i].setRotationAngle(0);
             // layouts[i].setStepDelay(10);
@@ -201,7 +183,7 @@ public class Cribbage extends CardGame {
         crib.setView(this, layout);
         // crib.setTargetArea(cribTarget);
         crib.draw();
-        for (IPlayer player : players) {
+        for (IPlayer player: players) {
             for (int i = 0; i < nDiscards; i++) {
                 transfer(player.discard(), crib);
             }
@@ -222,7 +204,7 @@ public class Cribbage extends CardGame {
 
     int total(Hand hand) {
         int total = 0;
-        for (Card c : hand.getCardList()) total += cardValue(c);
+        for (Card c: hand.getCardList()) total += cardValue(c);
         return total;
     }
 
@@ -243,49 +225,35 @@ public class Cribbage extends CardGame {
     }
 
     private void play() {
-        ScoringStrategySingletonFactory strategy = ScoringStrategySingletonFactory.getInstance();
-        IScoringStrategy playStrategy = strategy.getScoringStrategy("PLAY");
-        IScoringStrategy goStrategy = strategy.getScoringStrategy("GO");
         final int thirtyone = 31;
         List<Hand> segments = new ArrayList<>();
         int currentPlayer = 0; // Player 1 is dealer
         Segment s = new Segment();
         s.reset(segments);
-        boolean go = false;
-        while (!go) {
+        while (!(players[0].emptyHand() && players[1].emptyHand())) {
             // System.out.println("segments.size() = " + segments.size());
-            Card nextCard = players[currentPlayer].lay(thirtyone - total(s.segment));
+            Card nextCard = players[currentPlayer].lay(thirtyone-total(s.segment));
             if (nextCard == null) {
                 if (s.go) {
                     // Another "go" after previous one with no intervening cards
                     // lastPlayer gets 1 point for a "go"
                     s.newSegment = true;
-                    scores[currentPlayer] += goStrategy.getScore(s.segment).get(0).getScore();
-                    System.out.printf("player %d get 1 score%n", currentPlayer);
-                    updateScore(currentPlayer);
-                    go = true;
                 } else {
                     // currentPlayer says "go"
                     s.go = true;
                 }
-                currentPlayer = (currentPlayer + 1) % 2;
+                currentPlayer = (currentPlayer+1) % 2;
             } else {
                 s.lastPlayer = currentPlayer; // last Player to play a card in this segment
                 transfer(nextCard, s.segment);
-                List<IScoringStrategy.Score> playScores = playStrategy.getScore(s.segment);
-                for (IScoringStrategy.Score score : playScores) {
-                    scores[currentPlayer] += score.getScore();
-                    System.out.printf("player %d get %d score by rule %s %s%n", currentPlayer,score.getScore(), score.getStrategyName(), canonical(score.getHand()));
-                    updateScore(currentPlayer);
-                }
                 if (total(s.segment) == thirtyone) {
                     // lastPlayer gets 2 points for a 31
                     s.newSegment = true;
-                    currentPlayer = (currentPlayer + 1) % 2;
+                    currentPlayer = (currentPlayer+1) % 2;
                 } else {
                     // if total(segment) == 15, lastPlayer gets 2 points for a 15
                     if (!s.go) { // if it is "go" then same player gets another turn
-                        currentPlayer = (currentPlayer + 1) % 2;
+                        currentPlayer = (currentPlayer+1) % 2;
                     }
                 }
             }
@@ -297,32 +265,13 @@ public class Cribbage extends CardGame {
     }
 
     void showHandsCrib() {
-        ScoringStrategySingletonFactory strategy = ScoringStrategySingletonFactory.getInstance();
-        IScoringStrategy showStrategy = strategy.getScoringStrategy("SHOW");
-        p0.insert(starter.get(0).clone(), false);
-        List<IScoringStrategy.Score> showScores = showStrategy.getScore(p0);
-        for (IScoringStrategy.Score score : showScores) {
-            scores[0] += score.getScore();
-            System.out.printf("player %d get %d score by rule %s %s%n", 0,score.getScore(), score.getStrategyName(), canonical(score.getHand()));
-            updateScore(0);
-        }
-        p1.insert(starter.get(0).clone(), false);
-        showScores = showStrategy.getScore(p1);
-        for (IScoringStrategy.Score score : showScores) {
-            scores[1] += score.getScore();
-            System.out.printf("player %d get %d score by rule %s %s%n", 1,score.getScore(), score.getStrategyName(), canonical(score.getHand()));
-            updateScore(1);
-        }
+        // score player 0 (non dealer)
+        // score player 1 (dealer)
         // score crib (for dealer)
-        showScores = showStrategy.getScore(crib);
-        for (IScoringStrategy.Score score : showScores) {
-            scores[1] += score.getScore();
-            System.out.printf("player %d get %d score by rule %s %s%n", 1,score.getScore(), score.getStrategyName(), canonical(score.getHand()));
-            updateScore(1);
-        }
     }
 
-    public Cribbage() {
+    public Cribbage()
+    {
         super(850, 700, 30);
         cribbage = this;
         setTitle("Cribbage (V" + version + ") Constructed for UofM SWEN30006 with JGameGrid (www.aplu.ch)");
@@ -340,8 +289,6 @@ public class Cribbage extends CardGame {
         /* Play the round */
         deal(pack, hands);
         discardToCrib();
-        p0 = Utils.newHand(players[0].hand);
-        p1 = Utils.newHand(players[1].hand);
         starter(pack);
         play();
         showHandsCrib();
@@ -372,7 +319,7 @@ public class Cribbage extends CardGame {
 
         // Control Randomisation
         /* Read the first argument and save it as a seed if it exists */
-        if (args.length > 0) { // Use arg seed - overrides property
+        if (args.length > 0 ) { // Use arg seed - overrides property
             SEED = Integer.parseInt(args[0]);
         } else { // No arg
             String seedProp = cribbageProperties.getProperty("Seed");  //Seed property
