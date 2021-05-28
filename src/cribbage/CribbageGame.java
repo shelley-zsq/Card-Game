@@ -4,7 +4,6 @@ import ch.aplu.jcardgame.Card;
 import ch.aplu.jcardgame.Hand;
 
 public interface CribbageGame {
-    void updateScore(int player, int score);
     void deal(Hand pack, Hand[] hands);
     void discardToCrib();
     void starter(Hand pack);

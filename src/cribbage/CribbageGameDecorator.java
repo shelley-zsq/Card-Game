@@ -10,10 +10,6 @@ public abstract class CribbageGameDecorator implements CribbageGame {
         this.decoratedCribbage = cribbage;
     }
 
-    public void updateScore(int player, int score) {
-        decoratedCribbage.updateScore(player, score);
-    }
-
     public void deal(Hand pack, Hand[] hands) {
         decoratedCribbage.deal(pack, hands);
     }

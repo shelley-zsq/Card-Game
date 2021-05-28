@@ -132,7 +132,7 @@ public class Cribbage extends CardGame implements CribbageGame {
     public static void setStatus(String string) { cribbage.setStatusText(string); }
 
     static final IPlayer[] players = new IPlayer[nPlayers];
-    private final int[] scores = new int[nPlayers];
+    final int[] scores = new int[nPlayers];
 
     final Font normalFont = new Font("Serif", Font.BOLD, 24);
     final Font bigFont = new Font("Serif", Font.BOLD, 36);
@@ -345,6 +345,7 @@ public class Cribbage extends CardGame implements CribbageGame {
 
         Cribbage c = new Cribbage();
         CribbageGame loggingCribbage = new LoggingCribbageGameDecorator(c);
+        CribbageGame scoringCribbage = new ScoringCribbageGameDecorator(loggingCribbage);
         Hand pack = c.deck.toHand(false);
         RowLayout layout = new RowLayout(c.starterLocation, 0);
         layout.setRotationAngle(0);
@@ -353,13 +354,13 @@ public class Cribbage extends CardGame implements CribbageGame {
         pack.draw();
         c.addActor(new TextActor("Seed: " + SEED, Color.BLACK, c.bgColor, c.normalFont), c.seedLocation);
         /* Play the round */
-        loggingCribbage.deal(pack, c.hands);
-        loggingCribbage.discardToCrib();
-        loggingCribbage.starter(pack);
-        c.play(loggingCribbage);
-        loggingCribbage.showHandsCrib(0, c.starter, c.hands[0]);
-        loggingCribbage.showHandsCrib(1, c.starter, c.hands[1]);
-        loggingCribbage.showHandsCrib(1, c.starter, c.crib);
+        scoringCribbage.deal(pack, c.hands);
+        scoringCribbage.discardToCrib();
+        scoringCribbage.starter(pack);
+        c.play(scoringCribbage);
+        scoringCribbage.showHandsCrib(0, c.starter, c.hands[0]);
+        scoringCribbage.showHandsCrib(1, c.starter, c.hands[1]);
+        scoringCribbage.showHandsCrib(1, c.starter, c.crib);
 
         c.addActor(new Actor("sprites/gameover.gif"), c.textLocation);
         c.setStatusText("Game over.");
@@ -377,12 +378,7 @@ public class Cribbage extends CardGame implements CribbageGame {
             // System.out.println("segments.size() = " + segments.size());
             Card nextCard = players[currentPlayer].lay(thirtyone-total(s.segment));
             if (nextCard == null) {
-                if (s.go) {
-                    // Another "go" after previous one with no intervening cards
-                    // lastPlayer gets 1 point for a "go"
-                    game.go(currentPlayer);
-                    s.newSegment = true;
-                } else {
+                if (!s.go) {
                     // currentPlayer says "go"
                     s.go = true;
                 }
@@ -404,6 +400,10 @@ public class Cribbage extends CardGame implements CribbageGame {
             if (s.newSegment) {
                 segments.add(s.segment);
                 s.reset(segments);
+            }
+            if ((players[0].emptyHand() && players[1].emptyHand())) {
+                game.go((currentPlayer+1) % 2);
+                s.newSegment = true;
             }
         }
     }
