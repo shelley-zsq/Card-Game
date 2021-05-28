@@ -2,7 +2,7 @@ package score.Show;
 
 import ch.aplu.jcardgame.Hand;
 import score.IScoringStrategy;
-import score.Utils;
+import cribbage.Utils;
 
 import java.util.ArrayList;
 import java.util.List;

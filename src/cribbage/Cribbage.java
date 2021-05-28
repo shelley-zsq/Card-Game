@@ -14,7 +14,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Cribbage extends CardGame {
+public class Cribbage extends CardGame implements CribbageGame {
     static Cribbage cribbage;  // Provide access to singleton
 
     public enum Suit {
@@ -105,7 +105,7 @@ public class Cribbage extends CardGame {
     private final int handWidth = 400;
     private final int cribWidth = 150;
     private final int segmentWidth = 180;
-    private final Deck deck = new Deck(Suit.values(), Rank.values(), "cover", new MyCardValues());
+    final Deck deck = new Deck(Suit.values(), Rank.values(), "cover", new MyCardValues());
     private final Location[] handLocations = {
             new Location(360, 75),
             new Location(360, 625)
@@ -126,12 +126,12 @@ public class Cribbage extends CardGame {
     private final Actor[] scoreActors = {null, null}; //, null, null };
     private final Location textLocation = new Location(350, 450);
     private final Hand[] hands = new Hand[nPlayers];
-    private Hand starter;
-    private Hand crib;
+    Hand starter;
+    Hand crib;
 
     public static void setStatus(String string) { cribbage.setStatusText(string); }
 
-    static private final IPlayer[] players = new IPlayer[nPlayers];
+    static final IPlayer[] players = new IPlayer[nPlayers];
     private final int[] scores = new int[nPlayers];
 
     final Font normalFont = new Font("Serif", Font.BOLD, 24);
@@ -145,13 +145,18 @@ public class Cribbage extends CardGame {
         }
     }
 
+    public void updateScore(int player, int score) {
+        scores[player] = score;
+        updateScore(player);
+    }
+
     private void updateScore(int player) {
         removeActor(scoreActors[player]);
         scoreActors[player] = new TextActor(String.valueOf(scores[player]), Color.WHITE, bgColor, bigFont);
         addActor(scoreActors[player], scoreLocations[player]);
     }
 
-    private void deal(Hand pack, Hand[] hands) {
+    public void deal(Hand pack, Hand[] hands) {
         for (int i = 0; i < nPlayers; i++) {
             hands[i] = new Hand(deck);
             // players[i] = (1 == i ? new HumanPlayer() : new RandomPlayer());
@@ -176,7 +181,13 @@ public class Cribbage extends CardGame {
         layouts[0].setStepDelay(0);
     }
 
-    private void discardToCrib() {
+    public void setCrib() {
+        for (int i = 0; i < nPlayers; i++) {
+            hands[i] = Utils.newHand(hands[i]);
+        }
+    }
+
+    public void discardToCrib() {
         crib = new Hand(deck);
         RowLayout layout = new RowLayout(cribLocation, cribWidth);
         layout.setRotationAngle(0);
@@ -189,9 +200,12 @@ public class Cribbage extends CardGame {
             }
             crib.sort(Hand.SortType.POINTPRIORITY, true);
         }
+        setCrib();
     }
 
-    private void starter(Hand pack) {
+    public void setStarter(Hand starter) {}
+
+    public void starter(Hand pack) {
         starter = new Hand(deck);  // if starter is a Jack, the dealer gets 2 points
         RowLayout layout = new RowLayout(starterLocation, 0);
         layout.setRotationAngle(0);
@@ -200,6 +214,7 @@ public class Cribbage extends CardGame {
         Card dealt = randomCard(pack);
         dealt.setVerso(false);
         transfer(dealt, starter);
+        setStarter(starter);
     }
 
     int total(Hand hand) {
@@ -224,6 +239,12 @@ public class Cribbage extends CardGame {
         }
     }
 
+    public void go(int player) {}
+
+    public void playCard(int player, Card card, Hand hand) {
+        transfer(card, hand);
+    }
+
     private void play() {
         final int thirtyone = 31;
         List<Hand> segments = new ArrayList<>();
@@ -237,6 +258,7 @@ public class Cribbage extends CardGame {
                 if (s.go) {
                     // Another "go" after previous one with no intervening cards
                     // lastPlayer gets 1 point for a "go"
+                    go(currentPlayer);
                     s.newSegment = true;
                 } else {
                     // currentPlayer says "go"
@@ -245,7 +267,7 @@ public class Cribbage extends CardGame {
                 currentPlayer = (currentPlayer+1) % 2;
             } else {
                 s.lastPlayer = currentPlayer; // last Player to play a card in this segment
-                transfer(nextCard, s.segment);
+                playCard(currentPlayer, nextCard, s.segment);
                 if (total(s.segment) == thirtyone) {
                     // lastPlayer gets 2 points for a 31
                     s.newSegment = true;
@@ -264,7 +286,7 @@ public class Cribbage extends CardGame {
         }
     }
 
-    void showHandsCrib() {
+    public void showHandsCrib(int player, Hand starter, Hand hand) {
         // score player 0 (non dealer)
         // score player 1 (dealer)
         // score crib (for dealer)
@@ -278,24 +300,6 @@ public class Cribbage extends CardGame {
         setStatusText("Initializing...");
         initScore();
 
-        Hand pack = deck.toHand(false);
-        RowLayout layout = new RowLayout(starterLocation, 0);
-        layout.setRotationAngle(0);
-        pack.setView(this, layout);
-        pack.setVerso(true);
-        pack.draw();
-        addActor(new TextActor("Seed: " + SEED, Color.BLACK, bgColor, normalFont), seedLocation);
-
-        /* Play the round */
-        deal(pack, hands);
-        discardToCrib();
-        starter(pack);
-        play();
-        showHandsCrib();
-
-        addActor(new Actor("sprites/gameover.gif"), textLocation);
-        setStatusText("Game over.");
-        refresh();
     }
 
     public static void main(String[] args)
@@ -339,7 +343,27 @@ public class Cribbage extends CardGame {
         players[1] = (IPlayer) clazz.getConstructor().newInstance();
         // End properties
 
-        new Cribbage();
+        Cribbage c = new Cribbage();
+        CribbageGame loggingCribbage = new LoggingCribbageGameDecorator(c);
+        Hand pack = c.deck.toHand(false);
+        RowLayout layout = new RowLayout(c.starterLocation, 0);
+        layout.setRotationAngle(0);
+        pack.setView(c, layout);
+        pack.setVerso(true);
+        pack.draw();
+        c.addActor(new TextActor("Seed: " + SEED, Color.BLACK, c.bgColor, c.normalFont), c.seedLocation);
+        /* Play the round */
+        loggingCribbage.deal(pack, c.hands);
+        loggingCribbage.discardToCrib();
+        loggingCribbage.starter(pack);
+        c.play();
+        c.showHandsCrib(0, c.starter, c.hands[0]);
+        c.showHandsCrib(1, c.starter, c.hands[1]);
+        c.showHandsCrib(1, c.starter, c.crib);
+
+        c.addActor(new Actor("sprites/gameover.gif"), c.textLocation);
+        c.setStatusText("Game over.");
+        c.refresh();
     }
 
 }

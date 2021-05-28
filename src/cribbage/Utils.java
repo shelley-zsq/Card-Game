@@ -1,13 +1,11 @@
-package score;
+package cribbage;
 
 import ch.aplu.jcardgame.Card;
-import ch.aplu.jcardgame.Deck;
 import ch.aplu.jcardgame.Hand;
-import cribbage.Cribbage;
+import score.IScoringStrategy;
 
 import java.util.List;
 import java.util.TreeSet;
-import java.util.stream.Stream;
 
 public class Utils {
     // get the last numCards in hand
@@ -82,22 +80,11 @@ public class Utils {
     }
 
     public static int computeTotalValue(Hand hand) {
-        int total = 0;
-        for (Card c : hand.getCardList()) {
-            total += ((Cribbage.Rank) c.getRank()).value;
-        }
-        return total;
+        return Cribbage.cribbage.total(hand);
     }
 
     public static Hand newHand(){
-        class MyCardValues implements Deck.CardValues { // Need to generate a unique value for every card
-            public int[] values(Enum suit) {  // Returns the value for each card in the suit
-                return Stream.of(Cribbage.Rank.values()).mapToInt(r -> (r.order - 1) * (Cribbage.Suit.values().length) + suit.ordinal()).toArray();
-            }
-        }
-
-        Hand hand = new Hand(new Deck(Cribbage.Suit.values(), Cribbage.Rank.values(), "cover", new MyCardValues()));
-        return hand;
+        return new Hand(Cribbage.cribbage.deck);
     }
 
     public static Hand newHand(Hand hand) {
