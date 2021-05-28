@@ -9,7 +9,7 @@ public class LoggingCribbageGameDecorator extends CribbageGameDecorator {
         super(cribbage);
         System.out.printf("seed,%d%n", Cribbage.SEED);
         for (int i = 0; i < Cribbage.players.length; i++) {
-            System.out.printf("%s,P%d%n", Cribbage.players[i].getClass(), i);
+            System.out.printf("%s,P%d%n", Cribbage.players[i].getClass().getName(), i);
         }
     }
 
@@ -45,11 +45,13 @@ public class LoggingCribbageGameDecorator extends CribbageGameDecorator {
 
     @Override
     public void playCard(int player, Card card, Hand hand) {
+        decoratedCribbage.playCard(player, card, hand);
         System.out.printf("play,P%d,%d,%s%n", player, Cribbage.cribbage.total(hand), Cribbage.cribbage.canonical(card));
     }
 
     @Override
-    public void showHand(int player, Hand starter, Hand hand) {
-        System.out.printf("show,P%d,%s+%s%n",player, Cribbage.cribbage.canonical(starter.get(0)), Cribbage.cribbage.total(hand));
+    public void showHandsCrib(int player, Hand starter, Hand hand) {
+        decoratedCribbage.showHandsCrib(player, starter, hand);
+        System.out.printf("show,P%d,%s+%s%n",player, Cribbage.cribbage.canonical(starter.get(0)), Cribbage.cribbage.canonical(hand));
     }
 }
