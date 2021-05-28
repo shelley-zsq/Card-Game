@@ -10,6 +10,8 @@ public class ScoringStrategySingletonFactory {
 
     public IScoringStrategy getScoringStrategy(String stage) {
         switch (stage) {
+            case "STARTER":
+                return new Jack();
             case "GO":
                 return new Go();
             case "PLAY":
@@ -51,7 +53,6 @@ public class ScoringStrategySingletonFactory {
                 flushStrategy.add(new Flush5());
                 flushStrategy.add(new Flush4());
                 showStrategy.add(flushStrategy);
-                showStrategy.add(new Jack());
                 return showStrategy;
             default:
                 return null;

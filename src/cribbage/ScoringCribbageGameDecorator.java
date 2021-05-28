@@ -34,8 +34,55 @@ public class ScoringCribbageGameDecorator extends CribbageGameDecorator {
     }
 
     @Override
-    public void showHandsCrib(int player, Hand starter, Hand hand) {
-        decoratedCribbage.showHandsCrib(player, starter, hand);
+    public void showHands(int player, Hand starter, Hand hand) {
+        decoratedCribbage.showHands(player, starter, hand);
+        Hand tmpHand = Utils.newHand(starter);
+        for (Card card : hand.getCardList()) {
+            tmpHand.insert(card.clone(), false);
+        }
+        hand = tmpHand;
+        IScoringStrategy showStrategy = ScoringStrategySingletonFactory.getInstance().getScoringStrategy("SHOW");
+        for (IScoringStrategy.Score score : showStrategy.getScore(hand)) {
+            Cribbage.cribbage.scores[player] += score.getScore();
+            Utils.appendToFile(String.format("score,P%d,%d,%d,%s,%s%n",
+                    player,
+                    Cribbage.cribbage.scores[player],
+                    score.getScore(),
+                    score.getStrategyName(),
+                    Cribbage.cribbage.canonical(score.getHand())));
+            System.out.printf("score,P%d,%d,%d,%s,%s%n",
+                    player,
+                    Cribbage.cribbage.scores[player],
+                    score.getScore(),
+                    score.getStrategyName(),
+                    Cribbage.cribbage.canonical(score.getHand()));
+            Cribbage.cribbage.updateScore(player, Cribbage.cribbage.scores[player]);
+        }
+
+        if (player == 1) {
+            IScoringStrategy starterStrategy = ScoringStrategySingletonFactory.getInstance().getScoringStrategy("STARTER");
+            for (IScoringStrategy.Score score : starterStrategy.getScore(hand)) {
+                Cribbage.cribbage.scores[player] += score.getScore();
+                Utils.appendToFile(String.format("score,P%d,%d,%d,%s,%s%n",
+                        player,
+                        Cribbage.cribbage.scores[player],
+                        score.getScore(),
+                        score.getStrategyName(),
+                        Cribbage.cribbage.canonical(score.getHand())));
+                System.out.printf("score,P%d,%d,%d,%s,%s%n",
+                        player,
+                        Cribbage.cribbage.scores[player],
+                        score.getScore(),
+                        score.getStrategyName(),
+                        Cribbage.cribbage.canonical(score.getHand()));
+                Cribbage.cribbage.updateScore(player, Cribbage.cribbage.scores[player]);
+            }
+        }
+    }
+
+    @Override
+    public void showCrib(int player, Hand starter, Hand hand) {
+        decoratedCribbage.showCrib(player, starter, hand);
         Hand tmpHand = Utils.newHand(starter);
         for (Card card : hand.getCardList()) {
             tmpHand.insert(card.clone(), false);

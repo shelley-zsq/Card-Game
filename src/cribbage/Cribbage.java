@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Cribbage extends CardGame implements CribbageGame {
-    static Cribbage cribbage;  // Provide access to singleton
+    public static Cribbage cribbage;  // Provide access to singleton
 
     public enum Suit {
         CLUBS, DIAMONDS, HEARTS, SPADES
@@ -50,7 +50,7 @@ public class Cribbage extends CardGame implements CribbageGame {
 
     String canonical(Card c) { return canonical((Rank) c.getRank()) + canonical((Suit) c.getSuit()); }
 
-    String canonical(Hand h) {
+    public String canonical(Hand h) {
         Hand h1 = new Hand(deck); // Clone to sort without changing the original hand
         for (Card C: h.getCardList()) h1.insert(C.getSuit(), C.getRank(), false);
         h1.sort(Hand.SortType.POINTPRIORITY, false);
@@ -203,8 +203,6 @@ public class Cribbage extends CardGame implements CribbageGame {
         setCrib();
     }
 
-    public void setStarter(Hand starter) {}
-
     public void starter(Hand pack) {
         starter = new Hand(deck);  // if starter is a Jack, the dealer gets 2 points
         RowLayout layout = new RowLayout(starterLocation, 0);
@@ -214,7 +212,6 @@ public class Cribbage extends CardGame implements CribbageGame {
         Card dealt = randomCard(pack);
         dealt.setVerso(false);
         transfer(dealt, starter);
-        setStarter(starter);
     }
 
     int total(Hand hand) {
@@ -286,11 +283,13 @@ public class Cribbage extends CardGame implements CribbageGame {
 //        }
 //    }
 
-    public void showHandsCrib(int player, Hand starter, Hand hand) {
+    public void showHands(int player, Hand starter, Hand hand) {
         // score player 0 (non dealer)
         // score player 1 (dealer)
         // score crib (for dealer)
     }
+
+    public void showCrib(int player, Hand starter, Hand hand) {}
 
     public Cribbage()
     {
@@ -358,9 +357,9 @@ public class Cribbage extends CardGame implements CribbageGame {
         scoringCribbage.discardToCrib();
         scoringCribbage.starter(pack);
         c.play(scoringCribbage);
-        scoringCribbage.showHandsCrib(0, c.starter, c.hands[0]);
-        scoringCribbage.showHandsCrib(1, c.starter, c.hands[1]);
-        scoringCribbage.showHandsCrib(1, c.starter, c.crib);
+        scoringCribbage.showHands(0, c.starter, c.hands[0]);
+        scoringCribbage.showHands(1, c.starter, c.hands[1]);
+        scoringCribbage.showCrib(1, c.starter, c.crib);
 
         c.addActor(new Actor("sprites/gameover.gif"), c.textLocation);
         c.setStatusText("Game over.");

@@ -61,8 +61,15 @@ public class LoggingCribbageGameDecorator extends CribbageGameDecorator {
     }
 
     @Override
-    public void showHandsCrib(int player, Hand starter, Hand hand) {
-        decoratedCribbage.showHandsCrib(player, starter, hand);
+    public void showHands(int player, Hand starter, Hand hand) {
+        decoratedCribbage.showHands(player, starter, hand);
+        Utils.appendToFile(String.format("show,P%d,%s+%s%n",player, Cribbage.cribbage.canonical(starter.get(0)), Cribbage.cribbage.canonical(hand)));
+        System.out.printf("show,P%d,%s+%s%n",player, Cribbage.cribbage.canonical(starter.get(0)), Cribbage.cribbage.canonical(hand));
+    }
+
+    @Override
+    public void showCrib(int player, Hand starter, Hand hand) {
+        decoratedCribbage.showCrib(player, starter, hand);
         Utils.appendToFile(String.format("show,P%d,%s+%s%n",player, Cribbage.cribbage.canonical(starter.get(0)), Cribbage.cribbage.canonical(hand)));
         System.out.printf("show,P%d,%s+%s%n",player, Cribbage.cribbage.canonical(starter.get(0)), Cribbage.cribbage.canonical(hand));
     }

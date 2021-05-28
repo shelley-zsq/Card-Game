@@ -5,6 +5,7 @@ import score.IScoringStrategy;
 import cribbage.Utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Run5 implements IScoringStrategy {
@@ -28,6 +29,7 @@ public class Run5 implements IScoringStrategy {
             }
         }
 
+        Collections.sort(result);
         return result;
     }
 }

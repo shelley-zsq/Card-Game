@@ -5,6 +5,7 @@ import score.IScoringStrategy;
 import cribbage.Utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Fifteen implements IScoringStrategy {
@@ -22,7 +23,7 @@ public class Fifteen implements IScoringStrategy {
         hand = Utils.newHand(hand);
         hand.sort(Hand.SortType.POINTPRIORITY, false);
         List<Score> result = new ArrayList<>();
-        List<Hand> hands= new ArrayList<>();
+        List<Hand> hands = new ArrayList<>();
         // since the max face value is 10, 2 or more cards can have face value of 15, start from 2.
         for (int i = 2; i <= NUM_CARDS; i++) {
             Utils.combine(hand, 0, Utils.newHand(), i, hands);
@@ -33,6 +34,7 @@ public class Fifteen implements IScoringStrategy {
                 result.add(new Score(SCORE, STRATEGY_NAME, h));
             }
         }
+        Collections.sort(result);
         return result;
     }
 }

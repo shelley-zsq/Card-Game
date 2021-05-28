@@ -7,6 +7,7 @@ import score.IScoringStrategy;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
@@ -64,14 +65,19 @@ public class Utils {
     public static IScoringStrategy.Score getRunScore(Hand hand, int numCards, int score, String strategyName) {
         hand = tail(hand, numCards);
         if (hand != null) {
-            TreeSet<Integer> cardSet = new TreeSet<>();
-            for (int i = 0; i < numCards; i++) {
-                cardSet.add(((Cribbage.Rank) hand.get(i).getRank()).order);
+            List<Card> listCard = hand.getCardList();
+            List<Integer> ranks = new ArrayList<>();
+            int minRank = 14;
+            for (Card card : listCard) {
+                int rank = ((Cribbage.Rank) card.getRank()).order;
+                ranks.add(rank);
+                if (minRank > rank) {
+                    minRank = rank;
+                }
             }
-            int minCard = cardSet.first();
             boolean run = true;
-            for (int i = 1; i < cardSet.size(); i++) {
-                if (!cardSet.contains(minCard + i)) {
+            for (int i = 1; i < listCard.size(); i++) {
+                if (!ranks.contains(minRank + i)) {
                     run = false;
                     break;
                 }

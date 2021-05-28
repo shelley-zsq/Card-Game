@@ -1,10 +1,13 @@
 package score;
 
 import ch.aplu.jcardgame.Hand;
+import cribbage.Cribbage;
+
 import java.util.List;
+import java.util.stream.Collectors;
 
 public interface IScoringStrategy {
-    class Score {
+    class Score implements Comparable {
         int score;
         String strategyName;
         Hand hand;
@@ -25,6 +28,12 @@ public interface IScoringStrategy {
 
         public Hand getHand() {
             return hand;
+        }
+
+        @Override
+        public int compareTo(Object o) {
+            Score other = (Score) o;
+            return Cribbage.cribbage.canonical(hand).compareTo(Cribbage.cribbage.canonical(other.hand));
         }
     }
 
