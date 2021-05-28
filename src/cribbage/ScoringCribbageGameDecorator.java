@@ -16,6 +16,7 @@ public class ScoringCribbageGameDecorator extends CribbageGameDecorator {
         IScoringStrategy goStrategy = ScoringStrategySingletonFactory.getInstance().getScoringStrategy("GO");
         IScoringStrategy.Score score = goStrategy.getScore(null).get(0);
         Cribbage.cribbage.scores[player] += score.getScore();
+        Utils.appendToFile(String.format("score,P%d,%d,%d,%s%n", player, Cribbage.cribbage.scores[player], score.getScore(), score.getStrategyName()));
         System.out.printf("score,P%d,%d,%d,%s%n", player, Cribbage.cribbage.scores[player], score.getScore(), score.getStrategyName());
         Cribbage.cribbage.updateScore(player, Cribbage.cribbage.scores[player]);
     }
@@ -26,6 +27,7 @@ public class ScoringCribbageGameDecorator extends CribbageGameDecorator {
         IScoringStrategy playStrategy = ScoringStrategySingletonFactory.getInstance().getScoringStrategy("PLAY");
         for (IScoringStrategy.Score score : playStrategy.getScore(hand)) {
             Cribbage.cribbage.scores[player] += score.getScore();
+            Utils.appendToFile(String.format("score,P%d,%d,%d,%s%n", player, Cribbage.cribbage.scores[player], score.getScore(), score.getStrategyName()));
             System.out.printf("score,P%d,%d,%d,%s%n", player, Cribbage.cribbage.scores[player], score.getScore(), score.getStrategyName());
             Cribbage.cribbage.updateScore(player, Cribbage.cribbage.scores[player]);
         }
@@ -42,6 +44,12 @@ public class ScoringCribbageGameDecorator extends CribbageGameDecorator {
         IScoringStrategy showStrategy = ScoringStrategySingletonFactory.getInstance().getScoringStrategy("SHOW");
         for (IScoringStrategy.Score score : showStrategy.getScore(hand)) {
             Cribbage.cribbage.scores[player] += score.getScore();
+            Utils.appendToFile(String.format("score,P%d,%d,%d,%s,%s%n",
+                    player,
+                    Cribbage.cribbage.scores[player],
+                    score.getScore(),
+                    score.getStrategyName(),
+                    Cribbage.cribbage.canonical(score.getHand())));
             System.out.printf("score,P%d,%d,%d,%s,%s%n",
                     player,
                     Cribbage.cribbage.scores[player],

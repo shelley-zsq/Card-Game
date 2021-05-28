@@ -4,6 +4,10 @@ import ch.aplu.jcardgame.Card;
 import ch.aplu.jcardgame.Hand;
 import score.IScoringStrategy;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -107,5 +111,20 @@ public class Utils {
             combine(hand, currentIndex + 1, withCurrent, targetLength, result);
             combine(hand, currentIndex + 1, tmpHand, targetLength, result);
         }
+    }
+
+    public static void createFile() {
+        try {
+            BufferedWriter out = new BufferedWriter(new FileWriter("cribbage.log"));
+            out.close();
+        } catch (IOException e) {}
+    }
+
+    public static void appendToFile(String line) {
+        try {
+            BufferedWriter out = new BufferedWriter(new FileWriter("cribbage.log", true));
+            out.append(line);
+            out.close();
+        } catch (IOException e) {}
     }
 }

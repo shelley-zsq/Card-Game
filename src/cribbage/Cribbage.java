@@ -378,7 +378,10 @@ public class Cribbage extends CardGame implements CribbageGame {
             // System.out.println("segments.size() = " + segments.size());
             Card nextCard = players[currentPlayer].lay(thirtyone-total(s.segment));
             if (nextCard == null) {
-                if (!s.go) {
+                if (s.go) {
+                    game.go(currentPlayer);
+                    s.newSegment = true;
+                } else {
                     // currentPlayer says "go"
                     s.go = true;
                 }
