@@ -51,13 +51,15 @@ public class Utils {
         for (int i = 0; i <= hand.getNumberOfCards() - numCards; i++) {
             Hand result = newHand();
             result.insert(hand.get(i).clone(), false);
+            boolean isPair = true;
             for (int j = 1; j < numCards; j++) {
                 if (hand.get(i).getRank() != hand.get(i + j).getRank()) {
+                    isPair = false;
                     break;
                 }
                 result.insert(hand.get(i + j).clone(), false);
             }
-            if (result.getNumberOfCards() == numCards) {
+            if (isPair) {
                 return result;
             }
         }
