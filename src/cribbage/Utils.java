@@ -53,11 +53,13 @@ public class Utils {
             result.insert(hand.get(i).clone(), false);
             for (int j = 1; j < numCards; j++) {
                 if (hand.get(i).getRank() != hand.get(i + j).getRank()) {
-                    return null;
+                    break;
                 }
                 result.insert(hand.get(i + j).clone(), false);
             }
-            return result;
+            if (result.getNumberOfCards() == numCards) {
+                return result;
+            }
         }
         return null;
     }

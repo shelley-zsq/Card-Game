@@ -19,6 +19,7 @@ score,P1,2,1,go
 show,P0,9C+[2D,3C,6D,9D]
 score,P0,2,2,fifteen,[6D,9C]
 score,P0,4,2,fifteen,[6D,9D]
+score,P0,6,2,pair2,[9C,9D]
 show,P1,9C+[3H,4S,8H,KD]
 score,P1,4,2,fifteen,[3H,4S,8H]
 show,P1,9C+[AC,AH,QC,KC]
