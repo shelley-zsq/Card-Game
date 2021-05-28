@@ -16,7 +16,7 @@ public class Jack implements IScoringStrategy {
 
     @Override
     public List<Score> getScore(Hand hand) {
-        hand = Utils.newHand(hand);
+        hand = Utils.tail(hand, 4);
         hand.sort(Hand.SortType.POINTPRIORITY, false);
         List<Score> result = new ArrayList<>();
 
