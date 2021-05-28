@@ -10,5 +10,4 @@ public interface CribbageGame {
     void go(int player);
     void playCard(int player, Card card, Hand hand);
     void showHands(int player, Hand starter, Hand hand);
-    void showCrib(int player, Hand starter, Hand hand);
 }

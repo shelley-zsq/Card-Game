@@ -57,6 +57,7 @@ public class Pair implements IScoringStrategy {
         List<Score> pair2 = new ArrayList<>();
         pair = Utils.containsPair(hand, 2);
         while (pair != null) {
+            System.out.println(pair);
             pair2.add(new Score(2, "pair2", pair));
             List<Card> cardList = hand.getCardList();
             hand = Utils.newHand();

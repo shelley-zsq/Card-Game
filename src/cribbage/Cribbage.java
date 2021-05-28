@@ -126,7 +126,7 @@ public class Cribbage extends CardGame implements CribbageGame {
     private final Actor[] scoreActors = {null, null}; //, null, null };
     private final Location textLocation = new Location(350, 450);
     private final Hand[] hands = new Hand[nPlayers];
-    Hand starter;
+    public Hand starter;
     Hand crib;
 
     public static void setStatus(String string) { cribbage.setStatusText(string); }
@@ -289,7 +289,6 @@ public class Cribbage extends CardGame implements CribbageGame {
         // score crib (for dealer)
     }
 
-    public void showCrib(int player, Hand starter, Hand hand) {}
 
     public Cribbage()
     {
@@ -359,7 +358,7 @@ public class Cribbage extends CardGame implements CribbageGame {
         c.play(scoringCribbage);
         scoringCribbage.showHands(0, c.starter, c.hands[0]);
         scoringCribbage.showHands(1, c.starter, c.hands[1]);
-        scoringCribbage.showCrib(1, c.starter, c.crib);
+        scoringCribbage.showHands(1, c.starter, c.crib);
 
         c.addActor(new Actor("sprites/gameover.gif"), c.textLocation);
         c.setStatusText("Game over.");

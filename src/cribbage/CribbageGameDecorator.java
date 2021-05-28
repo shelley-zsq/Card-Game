@@ -33,8 +33,4 @@ public abstract class CribbageGameDecorator implements CribbageGame {
     public void showHands(int player, Hand starter, Hand hand) {
         decoratedCribbage.showHands(player, starter, hand);
     }
-
-    public void showCrib(int player, Hand starter, Hand hand) {
-        decoratedCribbage.showCrib(player, starter, hand);
-    }
 }

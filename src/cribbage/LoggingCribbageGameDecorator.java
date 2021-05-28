@@ -31,15 +31,17 @@ public class LoggingCribbageGameDecorator extends CribbageGameDecorator {
 
     @Override
     public void discardToCrib() {
+        Hand[] originHands = new Hand[Cribbage.nPlayers];
+        originHands[0] = Utils.newHand(Cribbage.players[0].hand);
+        originHands[1] = Utils.newHand(Cribbage.players[1].hand);
         decoratedCribbage.discardToCrib();
         Hand[] discardCards = new Hand[Cribbage.nPlayers];
         for (int i = 0; i < Cribbage.nPlayers; i++) {
             discardCards[i] = Utils.newHand();
-            for (int j = 0; j < Cribbage.cribbage.crib.getNumberOfCards() / Cribbage.nPlayers; j++) {
-                discardCards[i].insert(
-                        Cribbage.cribbage.crib.get(
-                                j * Cribbage.cribbage.crib.getNumberOfCards() / Cribbage.nPlayers + i),
-                        false);
+            for (Card c : originHands[i].getCardList()) {
+                if (!Cribbage.players[i].hand.getCardList().contains(c)) {
+                    discardCards[i].insert(c.clone(), false);
+                }
             }
             Utils.appendToFile(String.format("discard,P%d,%s%n", i, Cribbage.cribbage.canonical(discardCards[i])));
             System.out.printf("discard,P%d,%s%n", i, Cribbage.cribbage.canonical(discardCards[i]));
@@ -63,13 +65,6 @@ public class LoggingCribbageGameDecorator extends CribbageGameDecorator {
     @Override
     public void showHands(int player, Hand starter, Hand hand) {
         decoratedCribbage.showHands(player, starter, hand);
-        Utils.appendToFile(String.format("show,P%d,%s+%s%n",player, Cribbage.cribbage.canonical(starter.get(0)), Cribbage.cribbage.canonical(hand)));
-        System.out.printf("show,P%d,%s+%s%n",player, Cribbage.cribbage.canonical(starter.get(0)), Cribbage.cribbage.canonical(hand));
-    }
-
-    @Override
-    public void showCrib(int player, Hand starter, Hand hand) {
-        decoratedCribbage.showCrib(player, starter, hand);
         Utils.appendToFile(String.format("show,P%d,%s+%s%n",player, Cribbage.cribbage.canonical(starter.get(0)), Cribbage.cribbage.canonical(hand)));
         System.out.printf("show,P%d,%s+%s%n",player, Cribbage.cribbage.canonical(starter.get(0)), Cribbage.cribbage.canonical(hand));
     }
